@@ -1,5 +1,8 @@
-﻿using BlogApi.Data;
+﻿using System.Security.Claims;
+using BlogApi.Data;
+using BlogApi.DTOs;
 using BlogApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,13 +27,20 @@ namespace BlogApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Article>> CreateArticle(Article article)
+        [Authorize]
+        public async Task<ActionResult<Article>> CreateArticle(CreateArticleDto dto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
+            var article = new Article
+            {
+                Title = dto.Title,
+                Content = dto.Content,
+                ImageUrl = dto.ImageUrl,
+                PublishedAt = dto.PublishedAt,
+                AuthorId = userId,
+            };
+            
             _db.Articles.Add(article);
             await _db.SaveChangesAsync();
 
