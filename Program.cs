@@ -1,5 +1,6 @@
 
 using System.Text;
+using System.Text.Json.Serialization;
 using BlogApi.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,12 @@ namespace BlogApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+                });
+
             builder.Services.AddOpenApi();
             builder.Services.AddDbContext<BlogDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("BlogDbContext")));
