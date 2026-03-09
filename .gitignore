@@ -1,0 +1,29 @@
+# .NET Core
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.dll
+*.pdb
+
+# Dependencies
+packages/
+*.csproj.user
+!global.json
+
+# Migrations (опционально, если хочешь коммитить)
+!/Migrations
+
+# Visual Studio / VS Code
+.vscode/
+.vs/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Database
+*.db
+*.sqlite
