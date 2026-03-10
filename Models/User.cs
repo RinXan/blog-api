@@ -10,6 +10,7 @@ namespace BlogApi.Models
         [JsonIgnore]
         public string PasswordHash { get; set; } = string.Empty;
         [JsonIgnore]
-        public virtual ICollection<Article> Articles { get; set; } = new List<Article>();   
+        public virtual ICollection<Article> Articles { get; set; } = new List<Article>();
+        public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }
 }
