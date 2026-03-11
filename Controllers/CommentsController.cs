@@ -5,6 +5,7 @@ using BlogApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 
 namespace BlogApi.Controllers;
 
@@ -47,6 +48,7 @@ public class CommentsController : ControllerBase
 
         return CreatedAtAction(nameof(GetComment), new { id = comment.Id }, new
         {
+            message = "Comment added successfully!",
             id = comment.Id,
             text = comment.Text,
             username = fullComment.Author.UserName,
@@ -100,6 +102,34 @@ public class CommentsController : ControllerBase
         _db.Comments.Remove(comment);
         await _db.SaveChangesAsync();
 
-        return Ok("Deleted successfully!");
+        return Ok(new { message = "Deleted successfully!" });
+    }
+
+    [HttpPut("{id}")]
+    [Authorize]
+    public async Task<IActionResult> UpdateComment(int id, CreateCommentDto dto)
+    {
+        var comment = await _db.Comments
+            .Include(c => c.Author)
+            .Include(c => c.Article)
+            .FirstOrDefaultAsync(c => c.Id == id);
+
+        if (comment == null)
+            return NotFound("Comment not found");
+
+        var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+        if (comment.AuthorId != userId)
+            return Unauthorized("You can only update your comments");
+
+        if (!string.IsNullOrEmpty(dto.Text))
+        {
+            comment.Text = dto.Text;
+            comment.CreatedAt = DateTime.Now;
+        }
+
+        await _db.SaveChangesAsync();
+
+        return Ok(new { message = "Updated successfully!" });
     }
 }

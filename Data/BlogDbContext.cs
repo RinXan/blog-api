@@ -38,6 +38,25 @@ namespace BlogApi.Data
                 .WithMany(u => u.Comments)
                 .HasForeignKey(c => c.AuthorId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Tag>(entity =>
+            {
+                entity.HasKey(t => t.Id);
+                entity.Property(t => t.Name).IsRequired().HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<ArticleTag>()
+                .HasKey(at => new { at.ArticleId, at.TagId });
+
+            modelBuilder.Entity<ArticleTag>()
+                .HasOne(at => at.Article)
+                .WithMany(a => a.ArticleTags)
+                .HasForeignKey(at => at.ArticleId);
+            
+            modelBuilder.Entity<ArticleTag>()
+                .HasOne(at => at.Tag)
+                .WithMany(a => a.ArticleTags)
+                .HasForeignKey(at => at.TagId);
         }
     }
 }

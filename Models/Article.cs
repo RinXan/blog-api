@@ -9,6 +9,7 @@
         public int AuthorId { get; set; }
         public DateTime PublishedAt {  get; set; }
         public virtual User Author { get; set; } = null!;
+        public List<ArticleTag> ArticleTags { get; set; } = new();
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
     }
 }
