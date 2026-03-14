@@ -13,6 +13,7 @@ namespace BlogApi.Data
         public DbSet<Article> Articles { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Comment> Comments { get; set; } = null!;
+        public DbSet<Tag> Tags { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

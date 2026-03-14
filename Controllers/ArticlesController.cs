@@ -31,6 +31,10 @@ namespace BlogApi.Controllers
         {
             var article = await _db.Articles
                 .Include(a => a.Author)
+                .Include(a => a.ArticleTags)
+                    .ThenInclude(at => at.Tag)
+                .Include(a => a.Comments)
+                    .ThenInclude(a => a.Author)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
             if (article == null)
@@ -56,6 +60,28 @@ namespace BlogApi.Controllers
 
             _db.Articles.Add(article);
             await _db.SaveChangesAsync();
+
+            if (dto.TagIds != null && dto.TagIds.Any())
+            {
+                foreach (var tId in dto.TagIds)
+                {
+                    var tag = await _db.Tags.FindAsync(tId);
+                    if (tag == null) continue;
+
+                    bool exists = await _db.Set<ArticleTag>()
+                        .AnyAsync(at => at.ArticleId == article.Id && at.TagId == tId);
+                    if (exists) continue;
+
+                    var articleTag = new ArticleTag
+                    {
+                        ArticleId = article.Id,
+                        TagId = tId
+                    };
+
+                    _db.Set<ArticleTag>().Add(articleTag);
+                }
+                await _db.SaveChangesAsync();
+            }
 
             return CreatedAtAction(nameof(GetArticles), new { id = article.Id }, article);
         }
@@ -102,5 +128,31 @@ namespace BlogApi.Controllers
 
             return Ok("Deleted successfully!");
         }
-    }
+
+        [HttpDelete("{articleId}/tags/{tagId}")]
+        [Authorize]
+        public async Task<IActionResult> RemoveTagFromArticle(int articleId, int tagId)
+        {
+            var article = await _db.Articles
+                .Include(a => a.Author)
+                .Where(a => a.Id == articleId)
+                .FirstOrDefaultAsync();
+
+            if (article == null) return NotFound(new { message = $"Article #{articleId} not found" });
+
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+
+            if (article.AuthorId != userId) return Unauthorized(new { message = "You cannot delete tags from others article" });
+
+            var articleTag = await _db.Set<ArticleTag>()
+                .FirstOrDefaultAsync(at => at.ArticleId == articleId && at.TagId == tagId);
+
+            if (articleTag == null) return NotFound(new { message = $"Tag #{tagId} does not exist" });
+
+            _db.Set<ArticleTag>().Remove(articleTag);
+            await _db.SaveChangesAsync();
+
+            return Ok(new { messgae = "Tag removed from artilce!" });
+        }
+    } 
 }

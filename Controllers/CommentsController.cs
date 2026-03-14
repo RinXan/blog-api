@@ -84,7 +84,7 @@ public class CommentsController : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize]
-    public async Task<IActionResult> DeleteComment(int id)
+    public async Task<ActionResult> DeleteComment(int id)
     {
         var comment = await _db.Comments
             .Include(c => c.Author)
@@ -107,7 +107,7 @@ public class CommentsController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize]
-    public async Task<IActionResult> UpdateComment(int id, CreateCommentDto dto)
+    public async Task<ActionResult> UpdateComment(int id, CreateCommentDto dto)
     {
         var comment = await _db.Comments
             .Include(c => c.Author)
