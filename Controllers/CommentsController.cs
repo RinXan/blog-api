@@ -22,7 +22,7 @@ public class CommentsController : ControllerBase
 
     [HttpPost("{articleId}")]
     [Authorize]
-    public async Task<ActionResult<Comment>> CreateComment(int articleId, CreateCommentDto dto)
+    public async Task<ActionResult<Comment>> CreateComment(int articleId, CommentDto dto)
     {
         var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
 
@@ -107,7 +107,7 @@ public class CommentsController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize]
-    public async Task<ActionResult> UpdateComment(int id, CreateCommentDto dto)
+    public async Task<ActionResult> UpdateComment(int id, CommentDto dto)
     {
         var comment = await _db.Comments
             .Include(c => c.Author)

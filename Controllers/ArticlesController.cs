@@ -20,10 +20,47 @@ namespace BlogApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Article>>> GetArticles()
+        public async Task<ActionResult<PagedResult<ArticleDto>>> GetArticles(int page = 1, int size = 10)
         {
-            var articles = await _db.Articles.ToListAsync();
-            return Ok(articles);
+
+            if (page < 1) page = 1;
+            if (size < 1 || size > 100) size = 10;
+
+            int total = await _db.Articles.CountAsync();
+
+            var articles = await _db.Articles
+                .OrderByDescending(x => x.PublishedAt)
+                .Skip((page - 1) * size)
+                .Take(size)
+                .Include(x => x.Author)
+                .Include(x => x.ArticleTags)!
+                    .ThenInclude(at => at.Tag)!
+                    .Select(x => new ArticleDto
+                    {
+                        Id = x.Id,
+                        Title = x.Title,
+                        Content = x.Content,
+                        PublishedAt = x.PublishedAt,
+                        Author = new AuthorDto
+                        {
+                            Id = x.Author.Id,
+                            UserName = x.Author.UserName,
+                            Email = x.Author.Email,
+                        },
+                        Tags = x.ArticleTags.Select(at => new ArticleTagDto
+                        {
+                            ArticleId = at.ArticleId,
+                            TagId = at.TagId,
+                            Tag = new TagDto
+                            {
+                                Id = at.Tag.Id,
+                                Name = at.Tag.Name
+                            }
+                        }).ToList()
+                    })
+                .ToListAsync();
+
+            return Ok(new PagedResult<ArticleDto>(articles, total, page, size));
         }
 
         [HttpGet("{id}")]
