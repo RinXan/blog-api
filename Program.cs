@@ -20,6 +20,9 @@ namespace BlogApi
                     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
                 });
 
+            builder.Services.AddEndpointsApiExplorer(); 
+            builder.Services.AddSwaggerGen();
+
             builder.Services.AddOpenApi();
             builder.Services.AddDbContext<BlogDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("BlogDbContext")));
@@ -52,7 +55,8 @@ namespace BlogApi
 
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
+                app.UseSwagger();           
+                app.UseSwaggerUI();
             }
 
             app.UseHttpsRedirection();

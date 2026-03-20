@@ -18,50 +18,78 @@ namespace BlogApi.Controllers
         {
             _db = db;
         }
-
         [HttpGet]
-        public async Task<ActionResult<PagedResult<ArticleDto>>> GetArticles(int page = 1, int size = 10)
+        public async Task<ActionResult<PagedResult<ArticleDto>>> GetArticles(
+            [FromQuery] int page = 1,
+            [FromQuery] int size = 10,
+            [FromQuery] string? search = null,
+            [FromQuery] string? tags = null,  // ← Добавили!
+            [FromQuery] string? sort = "published")
         {
-
             if (page < 1) page = 1;
             if (size < 1 || size > 100) size = 10;
 
-            int total = await _db.Articles.CountAsync();
-
-            var articles = await _db.Articles
-                .OrderByDescending(x => x.PublishedAt)
-                .Skip((page - 1) * size)
-                .Take(size)
-                .Include(x => x.Author)
-                .Include(x => x.ArticleTags)!
+            // 1. Загружаем статьи + АВТОРОВ + ТЕГИ
+            var allArticles = await _db.Articles
+                .Include(a => a.Author)
+                .Include(a => a.ArticleTags)!
                     .ThenInclude(at => at.Tag)!
-                    .Select(x => new ArticleDto
-                    {
-                        Id = x.Id,
-                        Title = x.Title,
-                        Content = x.Content,
-                        PublishedAt = x.PublishedAt,
-                        Author = new AuthorDto
-                        {
-                            Id = x.Author.Id,
-                            UserName = x.Author.UserName,
-                            Email = x.Author.Email,
-                        },
-                        Tags = x.ArticleTags.Select(at => new ArticleTagDto
-                        {
-                            ArticleId = at.ArticleId,
-                            TagId = at.TagId,
-                            Tag = new TagDto
-                            {
-                                Id = at.Tag.Id,
-                                Name = at.Tag.Name
-                            }
-                        }).ToList()
-                    })
+                .Select(a => new
+                {
+                    a.Id,
+                    a.Title,
+                    a.Content,
+                    a.PublishedAt,
+                    a.AuthorId,
+                    a.Author.UserName,
+                    Tags = a.ArticleTags.Select(at => at.Tag.Name).ToList()
+                })
                 .ToListAsync();
 
-            return Ok(new PagedResult<ArticleDto>(articles, total, page, size));
+            // 2. ФИЛЬТР ПО ТЕГАМ (в памяти)
+            var filtered = allArticles.AsQueryable();
+            if (!string.IsNullOrWhiteSpace(tags))
+            {
+                var tagNames = tags.Split(',').Select(t => t.Trim().ToLower()).ToList();
+                filtered = filtered.Where(a => tagNames.All(tag =>
+                    a.Tags.Any(t => t.ToLower() == tag)));
+            }
+
+            // 3. ФИЛЬТР ПОИСКА
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var searchTerm = search.Trim().ToLower();
+                filtered = filtered.Where(a =>
+                    a.Title.ToLower().Contains(searchTerm) ||
+                    a.Content.ToLower().Contains(searchTerm));
+            }
+
+            // 4. СОРТИРОВКА
+            filtered = (sort?.ToLower()) switch
+            {
+                "title" => filtered.OrderBy(a => a.Title),
+                _ => filtered.OrderByDescending(a => a.PublishedAt),
+            };
+            var total = filtered.Count();
+            var paged = filtered
+                .Skip((page - 1) * size)
+                .Take(size)
+                .Select(x => new AllArticlesDto
+                {
+                    Id = x.Id,
+                    Title = x.Title,
+                    PublishedAt = x.PublishedAt,
+                    Author = new AuthorDto
+                    {
+                        Id = x.AuthorId,
+                        UserName = x.UserName
+                    }
+                })
+                .ToList();
+
+            return Ok(new PagedResult<AllArticlesDto>(paged, total, page, size));
         }
+
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Article>> GetArticle(int id)
