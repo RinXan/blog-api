@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using BlogApi.Data;
+using BlogApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -22,6 +23,12 @@ namespace BlogApi
 
             builder.Services.AddEndpointsApiExplorer(); 
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IArticleService, ArticleService>();
+            builder.Services.AddScoped<ICommentService, CommentService>();
+            builder.Services.AddScoped<ITagService, TagService>();
+
 
             builder.Services.AddOpenApi();
             builder.Services.AddDbContext<BlogDbContext>(options =>

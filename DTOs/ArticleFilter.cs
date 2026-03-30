@@ -1,0 +1,12 @@
+﻿namespace BlogApi.DTOs
+{
+    public class ArticleFilter
+    {
+        public int Page { get; set; } = 1;
+        public int Size { get; set; } = 10;
+        public string? Search { get; set; }
+        public string? Tags { get; set; }
+        public string? Sort { get; set; } = "published";
+    }
+
+}
