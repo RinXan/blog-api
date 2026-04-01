@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using BlogApi.DTOs;
+using BlogApi.DTOs.Article;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Text;
 using BlogApi.Data;
-using BlogApi.DTOs;
+using BlogApi.DTOs.Auth;
 using BlogApi.Models;
 using BlogApi.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;

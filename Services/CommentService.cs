@@ -14,10 +14,12 @@ public class CommentService : ICommentService
 
     public async Task<Comment?> GetByIdAsync(int id)
     {
-        return await _db.Comments
+        var comment = await _db.Comments
             .Include(c => c.Author)
             .Include(c => c.Article)
             .FirstOrDefaultAsync(c => c.Id == id);
+
+        return comment ?? throw new KeyNotFoundException("Comment not found");
     }
 
     public async Task<IEnumerable<Comment>> GetByArticleAsync(int articleId)
@@ -57,7 +59,8 @@ public class CommentService : ICommentService
             .Include(c => c.Article)
             .FirstOrDefaultAsync(c => c.Id == id);
 
-        if (comment == null) return false;
+        if (comment == null)
+            throw new KeyNotFoundException("Comment not found");
 
         if (comment.AuthorId != userId && comment.Article.AuthorId != userId)
             throw new UnauthorizedAccessException();
@@ -71,7 +74,9 @@ public class CommentService : ICommentService
     public async Task<bool> UpdateAsync(int id, int userId, string text)
     {
         var comment = await _db.Comments.FindAsync(id);
-        if (comment == null) return false;
+
+        if (comment == null)
+            throw new KeyNotFoundException("Comment not found");
 
         if (comment.AuthorId != userId)
             throw new UnauthorizedAccessException();

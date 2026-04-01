@@ -1,4 +1,4 @@
-﻿namespace BlogApi.DTOs
+﻿namespace BlogApi.DTOs.Tag
 {
     public class CreateTagDto
     {

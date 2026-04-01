@@ -1,4 +1,4 @@
-﻿namespace BlogApi.DTOs
+﻿namespace BlogApi.DTOs.Common
 {
     public class PagedResult<T>
     {

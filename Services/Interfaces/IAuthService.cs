@@ -1,4 +1,4 @@
-﻿using BlogApi.DTOs;
+﻿using BlogApi.DTOs.Auth;
 
 namespace BlogApi.Services.Interfaces
 {

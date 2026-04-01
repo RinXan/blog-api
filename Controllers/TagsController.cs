@@ -1,6 +1,5 @@
 ﻿using System.Security.Claims;
-using BlogApi.DTOs;
-using BlogApi.Models;
+using BlogApi.DTOs.Tag;
 using BlogApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -27,18 +26,13 @@ public class TagsController : ControllerBase
     public async Task<IActionResult> GetTagsByArticle(int id)
     {
         var tags = await _service.GetTagsByArticleAsync(id);
-        return tags == null
-            ? NotFound(new { message = $"article with id {id} not found" })
-            : Ok(tags);
+        return Ok(tags);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetArticlesByTag(int id)
     {
-        var tag = await _service.GetByIdWithArticlesAsync(id);
-        return tag == null
-            ? NotFound(new { message = "Tag not found" })
-            : Ok(tag);
+        return Ok(await _service.GetByIdWithArticlesAsync(id));
     }
 
     [HttpPost]
@@ -55,10 +49,8 @@ public class TagsController : ControllerBase
     {
         GetUserId(); 
 
-        var success = await _service.DeleteAsync(id);
+        await _service.DeleteAsync(id);
 
-        return success
-            ? Ok(new { message = $"Tag #{id} deleted!" })
-            : NotFound(new { message = $"Tag #{id} not found" });
+        return Ok(new { message = $"Tag #{id} deleted!" });
     }
 }

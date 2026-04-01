@@ -1,4 +1,5 @@
-﻿using BlogApi.DTOs;
+﻿using BlogApi.DTOs.Article;
+using BlogApi.DTOs.Common;
 using BlogApi.Models;
 
 public interface IArticleService

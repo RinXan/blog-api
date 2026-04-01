@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using BlogApi.DTOs;
+using BlogApi.DTOs.Comment;
 using BlogApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -47,23 +47,22 @@ public class CommentsController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetComment(int id)
     {
-        var comment = await _service.GetByIdAsync(id);
-        return comment == null ? NotFound() : Ok(comment);
+        return Ok(await _service.GetByIdAsync(id));
     }
 
     [HttpDelete("{id}")]
     [Authorize]
     public async Task<IActionResult> DeleteComment(int id)
     {
-        var success = await _service.DeleteAsync(id, GetUserId());
-        return success ? Ok(new { message = "Deleted successfully!" }) : NotFound();
+        await _service.DeleteAsync(id, GetUserId());
+        return Ok(new { message = "Deleted successfully!" });
     }
 
     [HttpPut("{id}")]
     [Authorize]
     public async Task<IActionResult> UpdateComment(int id, CommentDto dto)
     {
-        var success = await _service.UpdateAsync(id, GetUserId(), dto.Text);
-        return success ? Ok(new { message = "Updated successfully!" }) : NotFound();
+        await _service.UpdateAsync(id, GetUserId(), dto.Text);
+        return Ok(new { message = "Updated successfully!" });
     }
 }

@@ -14,25 +14,29 @@ public class TagService : ITagService
 
     public async Task<IEnumerable<Tag>> GetTagsByArticleAsync(int articleId)
     {
-        var article = await _db.Articles
-            .Where(a => a.Id == articleId)
-            .Include(a => a.ArticleTags)
-                .ThenInclude(at => at.Tag)
-            .FirstOrDefaultAsync();
+        var tags = await _db.ArticleTags
+            .Where(at => at.ArticleId == articleId)
+            .Select(at => at.Tag)
+            .ToListAsync();
 
-        if (article == null)
-            return null!;
+        if (!tags.Any())
+            throw new KeyNotFoundException($"No tags found for article {articleId}");
 
-        return article.ArticleTags.Select(at => at.Tag);
+        return tags;
     }
 
-    public async Task<Tag?> GetByIdWithArticlesAsync(int id)
+    public async Task<Tag> GetByIdWithArticlesAsync(int id)
     {
-        return await _db.Tags
+        var tag = await _db.Tags
             .Include(t => t.ArticleTags)
                 .ThenInclude(at => at.Article)
                 .ThenInclude(a => a.Author)
             .FirstOrDefaultAsync(t => t.Id == id);
+
+        if (tag == null)
+            throw new KeyNotFoundException("Tag not found");
+
+        return tag;
     }
 
     public async Task<Tag> GetOrCreateAsync(string name)
@@ -51,14 +55,14 @@ public class TagService : ITagService
         return tag;
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task DeleteAsync(int id)
     {
         var tag = await _db.Tags.FindAsync(id);
-        if (tag == null) return false;
+
+        if (tag == null)
+            throw new KeyNotFoundException("Tag not found");
 
         _db.Tags.Remove(tag);
         await _db.SaveChangesAsync();
-
-        return true;
     }
 }

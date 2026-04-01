@@ -1,4 +1,4 @@
-﻿using BlogApi.DTOs;
+﻿using BlogApi.DTOs.Auth;
 using BlogApi.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 

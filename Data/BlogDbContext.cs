@@ -15,6 +15,8 @@ namespace BlogApi.Data
         public DbSet<Comment> Comments { get; set; } = null!;
         public DbSet<Tag> Tags { get; set; } = null!;
 
+        public DbSet<ArticleTag> ArticleTags { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

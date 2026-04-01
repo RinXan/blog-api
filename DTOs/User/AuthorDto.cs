@@ -1,7 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using BlogApi.Models;
 
-namespace BlogApi.DTOs
+namespace BlogApi.DTOs.User
 {
     public class AuthorDto
     {

@@ -1,4 +1,4 @@
-﻿namespace BlogApi.DTOs
+﻿namespace BlogApi.DTOs.Article
 {
     public class ArticleFilter
     {

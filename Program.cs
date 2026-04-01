@@ -2,6 +2,7 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using BlogApi.Data;
+using BlogApi.Middleware;
 using BlogApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -67,6 +68,8 @@ namespace BlogApi
             }
 
             app.UseHttpsRedirection();
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseAuthentication();
 

@@ -1,6 +1,7 @@
-﻿using BlogApi.Models;
+﻿using BlogApi.DTOs.User;
+using BlogApi.Models;
 
-namespace BlogApi.DTOs
+namespace BlogApi.DTOs.Article
 {
     public class ArticleDto
     {

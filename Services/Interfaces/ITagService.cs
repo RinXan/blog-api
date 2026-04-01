@@ -7,6 +7,6 @@ namespace BlogApi.Services.Interfaces
         Task<IEnumerable<Tag>> GetTagsByArticleAsync(int articleId);
         Task<Tag?> GetByIdWithArticlesAsync(int id);
         Task<Tag> GetOrCreateAsync(string name);
-        Task<bool> DeleteAsync(int id);
+        Task DeleteAsync(int id);
     }
 }

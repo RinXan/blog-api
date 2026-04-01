@@ -1,4 +1,4 @@
-﻿namespace BlogApi.DTOs
+﻿namespace BlogApi.DTOs.Comment
 {
     public class CommentDto
     {
