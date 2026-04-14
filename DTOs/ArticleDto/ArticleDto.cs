@@ -1,5 +1,4 @@
 ﻿using BlogApi.DTOs.User;
-using BlogApi.Models;
 
 namespace BlogApi.DTOs.Article
 {
@@ -12,6 +11,6 @@ namespace BlogApi.DTOs.Article
         public DateTime PublishedAt { get; set; }
         public AuthorDto Author { get; set; } = null!;
         public List<ArticleTagDto> Tags { get; set; } = [];
-        public List<Comment> Comments { get; set; } = [];
+        public List<BlogApi.Models.Comment> Comments { get; set; } = new();
     }
 }

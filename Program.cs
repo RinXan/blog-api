@@ -7,6 +7,7 @@ using BlogApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 
 namespace BlogApi
 {
@@ -59,6 +60,18 @@ namespace BlogApi
                     };
                 });
 
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.Console()
+                .WriteTo.File(
+                    "logs/log.txt",
+                    rollingInterval: RollingInterval.Day,
+                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss} [{level}] {Message}{NewLine}{Exception}"
+                )
+                .CreateLogger();
+
+            builder.Host.UseSerilog();
+
             var app = builder.Build();
 
             if (app.Environment.IsDevelopment())
@@ -68,6 +81,8 @@ namespace BlogApi
             }
 
             app.UseHttpsRedirection();
+
+            app.UseMiddleware<RequestLoggingMiddleware>();
 
             app.UseMiddleware<ExceptionMiddleware>();
 

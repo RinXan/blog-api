@@ -1,6 +1,7 @@
 ﻿using BlogApi.Data;
 using BlogApi.DTOs.Article;
 using BlogApi.DTOs.Common;
+using BlogApi.DTOs.User;
 using BlogApi.Models;
 using Microsoft.EntityFrameworkCore;
 

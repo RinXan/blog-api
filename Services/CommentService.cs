@@ -5,11 +5,13 @@ using Microsoft.EntityFrameworkCore;
 
 public class CommentService : ICommentService
 {
+    private readonly ILogger<CommentService> _logger;
     private readonly BlogDbContext _db;
 
-    public CommentService(BlogDbContext db)
+    public CommentService(BlogDbContext db, ILogger<CommentService> logger)
     {
         _db = db;
+        _logger = logger;
     }
 
     public async Task<Comment?> GetByIdAsync(int id)

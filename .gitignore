@@ -1,6 +1,7 @@
 # .NET Core
 bin/
 obj/
+logs/
 *.user
 *.suo
 *.userosscache
